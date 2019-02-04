@@ -4,7 +4,7 @@ _multiprocessing made easy_
 
 ---
 
-###MAP METHODS
+### MAP METHODS
 
 ```
 def map_with_pool(map_function,args_list,max_processes=MAX_POOL_PROCESSES)
