@@ -107,8 +107,8 @@ Args:
     max_processes<int>:
         if not passed will set default based on pool_type
     jobs<list>:
-        list of (target,args_list). Note: the append method is there so you don't need to create 
-        (target,args_list) tuples.
+        list of (target,args,kwargs) tuples. Note: use the append method rather than
+        creating (target,args,kwargs) tuples
         
 """
 class MPList():
@@ -129,8 +129,8 @@ class MPList():
         self.jobs=jobs
 
         
-    def append(self,target,*args):
-        self.jobs.append((target,)+(args,))
+    def append(self,target,*args,**kwargs):
+        self.jobs.append((target,)+(args,)+(kwargs,))
         
     
     def run(self):
@@ -163,8 +163,8 @@ class MPList():
         
         
     def _target(self,args):
-        target,args=args
-        return target(*args)
+        target,args,kwargs=args
+        return target(*args,**kwargs)
         
     
 
