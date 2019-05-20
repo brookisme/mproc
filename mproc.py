@@ -123,10 +123,10 @@ class MPList():
     #
     # PUBLIC
     #
-    def __init__(self,pool_type=None,max_processes=None,jobs=[]):
+    def __init__(self,pool_type=None,max_processes=None,jobs=None):
         self.pool_type=pool_type or self.POOL
         self.max_processes=max_processes
-        self.jobs=jobs
+        self.jobs=jobs or []
 
         
     def append(self,target,*args,**kwargs):
