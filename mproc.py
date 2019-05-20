@@ -2,6 +2,7 @@ import itertools
 from multiprocessing import Process, cpu_count
 from multiprocessing import Pool
 from multiprocessing.pool import ThreadPool
+from datetime import datetime
 
 
 #
@@ -91,6 +92,81 @@ def simple(function,args_list,join=True):
 
 
 
+
+
+
+""" MPList
+Run the above methods on map_function,args_list pairs where the map_function
+changes for each new set of args in args_list
+
+Args:
+    pool_type<str>: 
+        one of MPList.POOL|THREAD|SEQUENTIAL.  determines which map_function 
+        and default max_processes to use. If not MPList.THREAD|SEQUENTIAL it 
+        will default to MPList.POOL.
+    max_processes<int>:
+        if not passed will set default based on pool_type
+    jobs<list>:
+        list of (target,args_list). Note: the append method is there so you don't need to create 
+        (target,args_list) tuples.
+        
+"""
+class MPList():
+    #
+    # POOL TYPES
+    #
+    POOL='pool'
+    THREAD='threading'
+    SEQUENTIAL='sequential'
+    
+
+    #
+    # PUBLIC
+    #
+    def __init__(self,pool_type=None,max_processes=None,jobs=[]):
+        self.pool_type=pool_type or self.POOL
+        self.max_processes=max_processes
+        self.jobs=jobs
+
+        
+    def append(self,target,*args):
+        self.jobs.append((target,)+(args,))
+        
+    
+    def run(self):
+        self.start_time=datetime.now()
+        map_func,self.max_processes=self._map_func_max_processes()
+        out=map_func(self._target,self.jobs,max_processes=self.max_processes)
+        self.end_time=datetime.now()
+        self.duration=str(self.end_time-self.start_time)
+        return out
+        
+
+    def __len__(self):
+        return len(self.jobs)
+    
+    
+    #
+    # INTERNAL
+    #    
+    def _map_func_max_processes(self):
+        if self.pool_type==MPList.THREAD:
+            map_func=map_with_threadpool
+            max_processes=self.max_processes or MAX_THREADPOOL_PROCESSES
+        elif self.pool_type==MPList.SEQUENTIAL:
+            map_func=map_sequential
+            max_processes=False
+        else:
+            map_func=map_with_pool
+            max_processes=self.max_processes or MAX_POOL_PROCESSES
+        return map_func, max_processes
+        
+        
+    def _target(self,args):
+        target,args=args
+        return target(*args)
+        
+    
 
 #
 # INTERNAL METHODS
