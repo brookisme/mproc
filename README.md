@@ -4,7 +4,17 @@ _multiprocessing made easy_
 
 ---
 
-### MAP METHODS
+#### INSTALL
+
+```bash
+git clone https://github.com/brookisme/mproc.git
+cd mproc
+pip install -e .
+```
+
+---
+
+#### MAP METHODS
 
 ```
 def map_with_pool(map_function,args_list,max_processes=MAX_POOL_PROCESSES)
@@ -39,4 +49,53 @@ def map_sequential(map_function,args_list,print_args=False,noisy=False,**dummy_k
       - development 
       - debugging
       - benchmarking 
+```
+
+---
+
+#### MPList
+
+The above methods are great when you have a single method you are calling multiple times with different arguments.
+
+If you want to launch a multiple processes/threads for distinct methods and arguments use `MPList`.
+
+The main instance methods are `append(method,*args,**kwargs)` which adds processes and `run()`  which starts the jobs.  An example might look like:
+
+```python
+def prediction(im,model_key,window,pad):
+  """ predict-stuff """
+  pass
+
+def cloud_score(im,window,pad):
+  """ compute-stuff """
+  pass
+
+mp_list=MPList()
+mp_list.append(
+    prediction,
+    im.astype(DTYPE),
+    model_key=model_key,
+    window=window,
+    pad=pad )
+mp_list.append(
+    cloud_score,
+    im,
+    window=window,
+    pad=pad )
+preds,(cmask,cscores)=mp_list.run()
+```
+
+```python
+""" MPList
+Args:
+    pool_type<str>: 
+        one of MPList.POOL|THREAD|SEQUENTIAL.  determines which map_function 
+        and default max_processes to use. If not MPList.THREAD|SEQUENTIAL it 
+        will default to MPList.POOL.
+    max_processes<int>:
+        if not passed will set default based on pool_type
+    jobs<list>:
+        list of (target,args,kwargs) tuples. Note: use the append method rather than
+        creating (target,args,kwargs) tuples
+"""
 ```
