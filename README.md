@@ -99,3 +99,13 @@ Args:
         creating (target,args,kwargs) tuples
 """
 ```
+
+
+---
+
+#### PYPI
+
+```bash
+python setup.py sdist
+twine upload dist/*
+```

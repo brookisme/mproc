@@ -20,7 +20,8 @@ MAX_THREADPOOL_PROCESSES=16
 
   Args:
     * map_function <function>: 
-      a function to map over args list. the function should take a single argument.
+      a function to map over args list. the function's initial argument must
+      is taken from args_list, additional kwargs may be passed to each call
       if multiple arguments are needed accept them as a single list or tuple
     * args_list <list>: the list of arguments to map over
     * max_process <int>: number of processes
@@ -40,31 +41,52 @@ MAX_THREADPOOL_PROCESSES=16
       - benchmarking 
 
 """
-def map_with_pool(map_function,args_list,max_processes=MAX_POOL_PROCESSES):
+def map_with_pool(
+    map_function,
+    args_list,
+    max_processes=MAX_POOL_PROCESSES,
+    **kwargs):
   pool=Pool(processes=min(len(args_list),max_processes))
-  return _run_pool(pool,map_function,args_list)
+  return _run_pool(
+    pool,
+    lambda a: map_function(a, **kwargs),
+    args_list)
 
 
-def map_with_threadpool(map_function,args_list,max_processes=MAX_THREADPOOL_PROCESSES):
+def map_with_threadpool(
+    map_function,
+    args_list,
+    max_processes=MAX_THREADPOOL_PROCESSES,
+    **kwargs):
   pool=ThreadPool(processes=min(len(args_list),max_processes))
-  return _run_pool(pool,map_function,args_list)
+  return _run_pool(
+    pool,
+    lambda a: map_function(a, **kwargs),
+    args_list)
 
 
-def map_sequential(map_function,args_list,print_args=False,noisy=False,**dummy_kwargs):
+def map_sequential(
+    map_function,
+    args_list,
+    max_processes='__ignored',
+    print_args=False,
+    noisy=False,
+    **kwargs):
   if noisy:
     print('multiprocessing(test):')
   out=[]
-  for i,args in enumerate(args_list):
+  def _func(arg):
+    return map_function(arg, **kwargs)
+  for i,arg in enumerate(args_list):
       if noisy: 
         print('\t{}...'.format(i))
       if print_args:
-        print('\t{}'.format(args))
-      out.append(map_function(args))
+        print('\t{}'.format(arg))
+        print('-', kwargs)
+      out.append(lambda a: map_function(a, **kwargs)(arg))
   if noisy: 
     print('-'*25)
   return out
-
-
 
 
 

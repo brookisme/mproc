@@ -2,7 +2,7 @@ from distutils.core import setup
 setup(
   name = 'mproc',
   py_modules = ['mproc'],
-  version = '0.0.0.1',
+  version = '0.0.0.2',
   description = 'Python Multiprocessing helpers',
   author = 'Brookie Guzder-Williams',
   author_email = 'brook.williams@gmail.com',
