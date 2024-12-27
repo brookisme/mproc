@@ -83,7 +83,7 @@ def map_sequential(
       if print_args:
         print('\t{}'.format(arg))
         print('-', kwargs)
-      out.append(lambda a: map_function(a, **kwargs)(arg))
+      out.append(map_function(arg, **kwargs))
   if noisy: 
     print('-'*25)
   return out
