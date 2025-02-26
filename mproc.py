@@ -89,6 +89,30 @@ def map_sequential(
   return out
 
 
+def mapper(
+    map_type,
+    map_function,
+    args_list,
+    max_processes=MAX_THREADPOOL_PROCESSES,
+    **kwargs):
+  if isinstance(map_type, str):
+    map_type = map_type.lower()
+    if map_type == 'pool':
+      _mapper = map_with_pool
+    elif map_type in ['thread', 'threadpool']:
+      _mapper = map_with_threadpool
+    elif map_type == 'sequential':
+      _mapper = map_sequential
+    else:
+      raise ValueError('map_type must be pool, threadpool or sequential [{map_type}]')
+  else:
+    _mapper = map_type
+  return _mapper(
+    map_function=map_function,
+    args_list=args_list,
+    max_processes=max_processes,
+    **kwargs)
+
 
 """ simple: vanilla multiprocessing
   Args:
